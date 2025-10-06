@@ -23,11 +23,9 @@ Se realizaron los cambios mínimos necesarios en el manifiesto de la aplicación
 
 ---
 
-
-
 ## ¿Dónde descargar?
 
-Haz clic en la sección **"Releases"** en el panel derecho de esta página para encontrar y descargar el archivo APK listo para instalar.
+Haz clic en la sección **["Releases"](https://github.com/aevfly/conga-1090-android/releases)** en el panel derecho de esta página para encontrar y descargar el archivo APK listo para instalar.
 
 ---
 
@@ -59,6 +57,6 @@ The application’s manifest (`AndroidManifest.xml`) was modified with the minim
 
 ## Where to download?
 
-Click on the **"Releases"** section on the right panel of this page to find and download the ready-to-install APK file.
+Click on the **["Releases"](https://github.com/aevfly/conga-1090-android/releases)** section on the right panel of this page to find and download the ready-to-install APK file.
 
 ---
