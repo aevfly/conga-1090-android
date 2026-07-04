@@ -81,32 +81,34 @@ This section covers the extracted raw Flash memory dump (`128.bin`) and the deco
 *   **Unique Device ID (UID):** Mapped at address `0x1FFFF7AC` (12 bytes of unique silicon serial number).
 
 ### Memory Mapping & Vector Table
-
+```text
 Address       Value         Description
 0x08000000    0x20001450    Initial Stack Pointer (SRAM address)
 0x08000004    0x080000D1    Reset Handler vector (runs on boot)
 0x08000008    0x080000D9    NMI Vector
 0x0800000C    0x080000DB    HardFault Vector
+```
 
-Firmware Highlights
+### Firmware Highlights (Reconstructed from `256.c`)
 
 The decompiled code reveals several key structural modules and compiler helper functions:
-    Compiler Helpmates: Since Cortex-M0 lacks hardware division, the compiler included software routines:
-        __aeabi_uidiv (unsigned division) at FUN_080000ec
-        __aeabi_idiv (signed division) at FUN_08000118
-        memcpy and memset at FUN_08000162 and FUN_08000186
-    Main Task Scheduler / Event Loop (FUN_08000e34):
+
+*   **Compiler Helpmates:** Since Cortex-M0 lacks hardware division, the compiler included software routines:
+    *   `__aeabi_uidiv` (unsigned division) at `FUN_080000ec`
+    *   `__aeabi_idiv` (signed division) at `FUN_08000118`
+    *   `memcpy` and `memset` at `FUN_08000162` and `FUN_08000186`
+*   **Main Task Scheduler / Event Loop (`FUN_08000e34`):**
     A classic infinite superloop executing nested periodic tasks based on system flags:
-        Periodic Sensor Task: Increments system ticks, polls the ADC (battery level/voltages), processes gyroscope/accelerometer values, and scans infrared cliff sensors.
-
-        System State Tasks: Monitors wheel encoders for stalls (LW_Stall!!!, RW_Stall!!!), controls charging modes (CC Mode / CV Mode - Constant Current / Constant Voltage), manages cleaning algorithms (SPRIAL, WALLFOLLOW, RANDOMBOUNCE), and controls the buzzer (LS-1).
-
-        Wi-Fi Communication: Parses incoming serial packets from the standalone Tuya WR3 module over UART (listening for the standard Tuya frame header 0x55 0xAA).
-    Compilation Timestamp:
+    *   **Periodic Sensor Task:** Increments system ticks, polls the ADC (battery level/voltages), processes gyroscope/accelerometer values, and scans infrared cliff sensors.
+    *   **System State Tasks:** Monitors wheel encoders for stalls (`LW_Stall!!!`, `RW_Stall!!!`), controls charging modes (`CC Mode` / `CV Mode` - Constant Current / Constant Voltage), manages cleaning algorithms (`SPRIAL`, `WALLFOLLOW`, `RANDOMBOUNCE`), and controls the buzzer (`LS-1`).
+    *   **Wi-Fi Communication:** Parses incoming serial packets from the standalone Tuya WR3 module over UART (listening for the standard Tuya frame header `0x55 0xAA`).
+*   **Compilation Timestamp:**
     The binary embeds the exact factory compilation date and time:
-    Apr 30 2020 15:16:04
+    `Apr 30 2020 15:16:04`
 
-File Overview
+---
 
-    128.bin — Complete, non-destructive raw binary dump of the 128 KB Flash memory, extracted successfully via SWD.
-    128.c — Decompiled C source code of the entire firmware, generated using Ghidra with the ARM:LE:32:Cortex profile.
+## File Overview
+
+*   `128.bin` — Complete, non-destructive raw binary dump of the 128 KB Flash memory, extracted successfully via SWD.
+*   `128.c` — Decompiled C source code of the entire firmware, generated using Ghidra with the `ARM:LE:32:Cortex` profile.
