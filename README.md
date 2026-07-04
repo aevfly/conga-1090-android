@@ -61,9 +61,11 @@ Click on the **["Releases"](https://github.com/aevfly/conga-1090-android/release
 
 ---
 
-Main MCU Firmware & Hardware Analysis
-
-This section covers the extracted raw Flash memory dump (`128.bin`) and the decompiled C source code (`128.c`) of the robot's main microcontroller (MCU), responsible for movement and hardware sensors.
+Main MCU Firmware & Hardware  
+ 
+Repository contains the full, verified 128 KB raw Flash memory dump (`128.bin`) and its decompiled C source code (`128.c`) for the main microcontroller (MCU) of the Cecotec Conga 1090 and Polaris PVCR 1090 robot vacuums.  
+ 
+This section contains the extracted raw Flash memory dump (`128.bin`) and the decompiled C source code (`128.c`) of the robot's main microcontroller (MCU), responsible for movement and hardware sensors.
 
 ### Hardware Specifications
 
@@ -89,7 +91,7 @@ Address       Value         Description
 0x0800000C    0x080000DB    HardFault Vector
 ```
 
-### Firmware Highlights (Reconstructed from `256.c`)
+### Firmware Highlights 
 
 The decompiled code reveals several key structural modules and compiler helper functions:
 
