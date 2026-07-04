@@ -60,3 +60,53 @@ The application’s manifest (`AndroidManifest.xml`) was modified with the minim
 Click on the **["Releases"](https://github.com/aevfly/conga-1090-android/releases)** section on the right panel of this page to find and download the ready-to-install APK file.
 
 ---
+
+Main MCU Firmware & Hardware Analysis
+
+This section covers the extracted raw Flash memory dump (`128.bin`) and the decompiled C source code (`128.c`) of the robot's main microcontroller (MCU), responsible for movement and hardware sensors.
+
+### Hardware Specifications
+
+*   **Motherboard Model:** `D330-A-V1.0` (Silkscreen date: `20201010`)
+*   **Main Microcontroller (MCU):**
+    *   **Core:** 32-bit ARM Cortex-M0 (Little Endian)
+    *   **Silicon Family:** STM32F091/STM32F098 equivalent (e.g. `STM32F091RBT6` or `GD32F190RBT6` clone in LQFP64 package)
+    *   **Device IDCODE:** `0x10006442` (Register `0x40015800`)
+    *   **CPUID Register:** `0x410CC200` (ARM core r0p0)
+*   **Memory Capacity:**
+    *   **Flash (ROM):** **128 KB** (Reported by hardware register `0x1FFFF7CC` as `0x0080` = 128 KB). The active compiled program code and constant strings occupy **85.3 KB** (up to address `0x0001552F`). The remaining area is empty factory padding (`0xFF`).
+    *   **SRAM (RAM):** **32 KB** (Standard for the F09x family).
+*   **System Clock:** External **8.000 MHz** quartz crystal (`Y2`).
+*   **Debug Protocol:** **SWD (Serial Wire Debug)** via the `J9` header labeled `V+ G C D`.
+*   **Unique Device ID (UID):** Mapped at address `0x1FFFF7AC` (12 bytes of unique silicon serial number).
+
+### Memory Mapping & Vector Table
+
+Address       Value         Description
+0x08000000    0x20001450    Initial Stack Pointer (SRAM address)
+0x08000004    0x080000D1    Reset Handler vector (runs on boot)
+0x08000008    0x080000D9    NMI Vector
+0x0800000C    0x080000DB    HardFault Vector
+
+Firmware Highlights
+
+The decompiled code reveals several key structural modules and compiler helper functions:
+    Compiler Helpmates: Since Cortex-M0 lacks hardware division, the compiler included software routines:
+        __aeabi_uidiv (unsigned division) at FUN_080000ec
+        __aeabi_idiv (signed division) at FUN_08000118
+        memcpy and memset at FUN_08000162 and FUN_08000186
+    Main Task Scheduler / Event Loop (FUN_08000e34):
+    A classic infinite superloop executing nested periodic tasks based on system flags:
+        Periodic Sensor Task: Increments system ticks, polls the ADC (battery level/voltages), processes gyroscope/accelerometer values, and scans infrared cliff sensors.
+
+        System State Tasks: Monitors wheel encoders for stalls (LW_Stall!!!, RW_Stall!!!), controls charging modes (CC Mode / CV Mode - Constant Current / Constant Voltage), manages cleaning algorithms (SPRIAL, WALLFOLLOW, RANDOMBOUNCE), and controls the buzzer (LS-1).
+
+        Wi-Fi Communication: Parses incoming serial packets from the standalone Tuya WR3 module over UART (listening for the standard Tuya frame header 0x55 0xAA).
+    Compilation Timestamp:
+    The binary embeds the exact factory compilation date and time:
+    Apr 30 2020 15:16:04
+
+File Overview
+
+    128.bin — Complete, non-destructive raw binary dump of the 128 KB Flash memory, extracted successfully via SWD.
+    128.c — Decompiled C source code of the entire firmware, generated using Ghidra with the ARM:LE:32:Cortex profile.
